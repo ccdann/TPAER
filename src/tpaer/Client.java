@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package testnodes;
+package tpaer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.Arrays;
 
 /**
  *
@@ -35,10 +36,12 @@ public class Client {
         // recieve the packet
         socket.receive(packet);
         System.out.println("Received");
+
+        
+  
         System.out.println(new String(packet.getData()) +" HOST: "
         + packet.getAddress().getHostAddress()+"CANOLICALHOST: "
-        + packet.getAddress().getCanonicalHostName()+"CANOLICALHOST: "
-        + packet.getAddress().hashCode());
+        + Arrays.toString(packet.getAddress().getAddress()));
     }
     
     public void close(){

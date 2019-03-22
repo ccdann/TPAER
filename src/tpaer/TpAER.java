@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package testnodes;
+package tpaer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
-import testnodes.Client;
-import testnodes.Server;
 
 
 /**
@@ -38,6 +36,11 @@ public class TpAER {
      */
     public static void main(String[] args) throws IOException, SocketException {
         
+        
+        //ClientTh clientTh   = new ClientTh();
+        //clientTh.run();
+        
+        
      
 
           
@@ -46,9 +49,7 @@ public class TpAER {
         
         
         Scanner scan= new Scanner(System.in);
-        
-      
-        
+
         
         int num= scan.nextInt();
         
@@ -92,10 +93,35 @@ public class TpAER {
         }
         
          if (num==3){   
-            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-            for (NetworkInterface netint : Collections.list(nets)) {
-              displayInterfaceInformation(netint);
-            }
+         //   Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+          //  for (NetworkInterface netint : Collections.list(nets)) {
+            //  displayInterfaceInformation(netint);
+            //}
+            
+            
+             NetworkInterface nets1 = NetworkInterface.getByName("eth0");
+           
+             byte[] mac = nets1.getHardwareAddress(); 
+             
+             System.out.printf("Hardware name: %s%n", Arrays.toString(nets1.getHardwareAddress()));  
+             
+             List<InterfaceAddress> interfaceAddresses = nets1.getInterfaceAddresses();    
+             System.out.printf("InterfaceAddress: %s%n", interfaceAddresses.get(2).getAddress().getCanonicalHostName());
+             
+             System.out.print("Current MAC address : ");
+			
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < mac.length; i++) {
+			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
+		}
+	     System.out.println(sb.toString());
+           
+             
+             
+             
+            
+            
+            
          }
         
         
@@ -109,17 +135,13 @@ public class TpAER {
                 System.out.printf("Name: %s%n", netint.getName());
                 Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
                 for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-                  System.out.printf("InetAddress: %s%n", inetAddress);
+                  System.out.printf("InetAddress: %s%n", inetAddress.getCanonicalHostName());
                 }
 
-                System.out.printf("Parent: %s%n", netint.getParent());
-                System.out.printf("Up? %s%n", netint.isUp());
-                System.out.printf("Loopback? %s%n", netint.isLoopback());
-                System.out.printf("PointToPoint? %s%n", netint.isPointToPoint());
-                System.out.printf("Supports multicast? %s%n", netint.isVirtual());
-                System.out.printf("Virtual? %s%n", netint.isVirtual());
+       
                 System.out.printf("Hardware address: %s%n", Arrays.toString(netint.getHardwareAddress()));
-                System.out.printf("MTU: %s%n", netint.getMTU());
+                System.out.printf("Teste:", netint.getHardwareAddress());
+                System.out.printf("Teste: %s%n", netint.getIndex());
 
                 List<InterfaceAddress> interfaceAddresses = netint.getInterfaceAddresses();
                 for (InterfaceAddress addr : interfaceAddresses) {
