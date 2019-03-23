@@ -31,7 +31,8 @@ public class ClientTh implements Runnable{
 	/*
 	 * Our byte arrays that we'll use to read in and send out to our UDP server
 	 */
-	private byte[] outData;
+	
+    private byte[] outData;
     private byte[] inData;
 
     /*

@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -18,6 +19,7 @@ import java.util.Arrays;
 public class Client {
     
     private MulticastSocket socket;
+ 
     
     public Client(String ip, int port) throws IOException {
         
@@ -26,6 +28,7 @@ public class Client {
         
         // join by ip
         socket.joinGroup(InetAddress.getByName(ip));
+        
     }
     
     public void printMessage() throws IOException{
@@ -35,10 +38,11 @@ public class Client {
         
         // recieve the packet
         socket.receive(packet);
-        System.out.println("Received");
-
+           long t1 = System.nanoTime();
         
-  
+        System.out.println("Received");
+        System.out.println("time to receive "+ (System.nanoTime() - t1));
+
         System.out.println(new String(packet.getData()) +" HOST: "
         + packet.getAddress().getHostAddress()+"CANOLICALHOST: "
         + Arrays.toString(packet.getAddress().getAddress()));

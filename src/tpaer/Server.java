@@ -24,6 +24,8 @@ public class Server {
     
     private int port;
     
+   
+    
     public Server(String ip, int port) throws SocketException, IOException{
         this.ip = ip;
         this.port = port;
@@ -32,8 +34,11 @@ public class Server {
     }
     
     public void send() throws IOException{
+       
         // make datagram packet
         byte[] message = ("Multicasting...").getBytes();
+        
+        
         DatagramPacket packet = new DatagramPacket(message, message.length, 
             InetAddress.getByName(ip), port);
         // send packet
