@@ -41,6 +41,8 @@ public class Client {
            long t1 = System.nanoTime();
         
         System.out.println("Received");
+        
+         System.out.println("Time entre peers");
         System.out.println("time to receive "+ (System.nanoTime() - t1));
 
         System.out.println(new String(packet.getData()) +" HOST: "
