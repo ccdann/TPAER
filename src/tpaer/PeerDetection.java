@@ -15,12 +15,18 @@ import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  *
  * @author ccdann
  */
 public class PeerDetection extends Thread {
+    
+       private HashMap peerMap;
+       
+          private PeerDetectionListener peerListener;
+          
 
     
 
@@ -40,13 +46,21 @@ public class PeerDetection extends Thread {
      * Our Client constructor which instantiates our clientSocket
      * and get's our IPAddress
      */
-	public PeerDetection(String ip, int port) throws SocketException, UnknownHostException, IOException{
-		
-                
+	public PeerDetection(String ip, int port, PeerDetectionListener peer) throws SocketException, UnknownHostException, IOException{
+		super( "PeerDetection" );
+      
+      // set peerDiscoveryListener
+                               
+
                 socket = new MulticastSocket(port);
                 socket.joinGroup(InetAddress.getByName(ip));
+                peerMap = new HashMap();
+                peerListener = peer;
+                
+                
 		
 	}
+
 
 	private void shutdown(){
 		clientSocket.close();
@@ -68,9 +82,9 @@ public class PeerDetection extends Thread {
                                 socket.receive(packet);
                                 long t1 = System.nanoTime();
 
-                                System.out.println("Received");
-                                System.out.println("Time entre peers");
-                                System.out.println("time to receive "+ (System.nanoTime() - t1));
+                             //   System.out.println("Received");
+                               // System.out.println("Time entre peers");
+                               // System.out.println("time to receive "+ (System.nanoTime() - t1));
                                 
 
                                /* System.out.println(new String(packet.getData()) +" HOST: "
@@ -79,21 +93,47 @@ public class PeerDetection extends Thread {
                                 */
                                // String msg = new String(packet.getData());
                                 
-                                 String msg = new String( packet.getData(), packet.getOffset(), packet.getLength() );
+                           String msg = new String( packet.getData(), packet.getOffset(), packet.getLength() );
 
-                            System.out.println(msg);
-
-                            // decide if goodbye or hello
-                            if (msg.startsWith("Hello")){
-                              
-                                System.out.println("é um hello!!");
+                           // System.out.println(msg);
+                            String msg1 = msg.substring(Settings.HELLO.length());
+                               //System.out.println("MSG1:"+ msg1);
+                            
+                               //HOP1
+                               
+                            if (msg.startsWith(Settings.HELLO)){
+                             
                                 
+                                if(!InetAddress.getLocalHost().getHostName().equals(msg1)){
+                                     processHello( 
+                                            msg.substring( Settings.HELLO.length() ),
+                                            packet.getAddress().getHostAddress()
+                                         );
+                                }
+                               // System.out.println("é um hello!!");
+                               
+                               //HELLO FROM N1
+                               //peerMap.put("1", msg.substring( Settings.HELLO.length()));
+                               
+                               
                                 
                                // System.out.println(message.substring( HELLO_HEADER.length(), packet.getAddress().getHostAddress());
                               //  processHello( 
                                 //  message.substring( HELLO_HEADER.length() ),
                                 //  packet.getAddress().getHostAddress()
                               ///  )) );
+                              
+                              //HOP2
+                            }else{ 
+                              
+                                System.out.println("Hop2");                             
+                                System.out.println(msg);
+
+                                
+                                
+                              //  peerListener.addPeer( "teste", "teste",peerMap);
+                                
+                            
                             }
 			
 
@@ -106,28 +146,61 @@ public class PeerDetection extends Thread {
 		}
 	}
         
-        /*
         
-        
-                        // process hello message from peer
-                  public void savePeer( String peerName, 
-                     String registryAddress  )
-                  {
-                     registryAddress += ( "/" + BINDING_NAME );
-                     synchronized( peerTTLMap )
-                     {
 
-                        // if it is a new peer, call peerAdded event
-                        if ( !peerTTLMap.containsKey( peerName ) ) {
-                              peerDiscoveryListener.peerAdded( peerName, 
-                                 registryAddress);
-                        }
+                                // process hello message from peer
+                           public void processHello( String peerOrg, 
+                              String registryAddress  ) throws UnknownHostException, IOException
+                           {
+                               
+                               
+                    
+                                    //comparar com o no presente
+                                 // if it is a new peer, call peerAdded event
+                                 if (!peerMap.containsValue(peerOrg)) {
+                                    
+                                     peerMap.put(peerOrg,registryAddress);
+                                    
+                                      //System.out.println("add to hasmap" + peerOrg);
+                                       peerListener.addPeer( peerOrg, 
+                                          registryAddress,peerMap);
+                                       
+                                       
+                                       
+                                 }
+                                 
+                                 processhop2(peerOrg, registryAddress,peerMap);
 
-                        // add to map or if present, refresh TTL
-                        peerTTLMap.put( peerName, new Integer( PEER_TTL ) );
+                                 
+                                 
+                                 //Lista de  hops seguintes
+                                  
 
-                     } 
-                  }*/
+                                 
+                                 
+                              //   peerMap.put(peerName, registryAddress);
+
+
+                                
+
+                              
+                           }
+                           
+                           public void processhop2(String peerOrg, String registryAddress, HashMap peersList) throws IOException{
+                           
+                                Hello sendHello = new Hello(registryAddress, 9999, peerOrg);
+                             
+                                
+                                //if(!peerListener.verifyPeer(peerList)){
+                                
+                                
+                                //}
+                                sendHello.sendhop2(peersList);
+                                sendHello.close();
+                           
+                           
+                           
+                           }
 
    
     

@@ -11,24 +11,27 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.TimerTask;
 
 /**
  *
  * @author ccdann
  */
-public class Hello {
+public class Hello extends TimerTask {
     
     private DatagramSocket serverSocket;
     
     private String ip;
-    
+    private String node;
     private int port;
     
    
     
-    public Hello(String ip, int port) throws SocketException, IOException{
+    public Hello(String ip, int port, String node) throws SocketException, IOException{
         this.ip = ip;
         this.port = port;
+        this.node = node;
         // socket used to send
         serverSocket = new DatagramSocket();
     }
@@ -36,7 +39,7 @@ public class Hello {
     public void send() throws IOException{
        
         // make datagram packet
-        byte[] message = ("Hello").getBytes();
+        byte[] message = (Settings.HELLO + node).getBytes();
         
         
         DatagramPacket packet = new DatagramPacket(message, message.length, 
@@ -45,8 +48,28 @@ public class Hello {
         serverSocket.send(packet);
     }
     
+    
+    
+       public void sendhop2(HashMap peersList) throws IOException{
+       
+        // make datagram packet
+        byte[] message = (peersList.toString().getBytes());
+        
+        
+        DatagramPacket packet = new DatagramPacket(message, message.length, 
+            InetAddress.getByName(ip), port);
+        // send packet
+        serverSocket.send(packet);
+        
+        }
+    
     public void close(){
         serverSocket.close();
+    }
+
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

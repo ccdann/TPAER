@@ -18,11 +18,21 @@ import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -34,25 +44,39 @@ public class TpAER {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException, SocketException, InterruptedException {
+    public static void main(String[] args) throws IOException, SocketException, InterruptedException, ParseException {
+        PeerDetectionListener peer = new PeerDetectionListener();
         
-        System.out.print(InetAddress.getLocalHost().getHostName());
         
+        
+
+        String node = InetAddress.getLocalHost().getHostName();
         
          final String ip = "ff02::1";
          final int port = 9999;
         
-        PeerDetection detect   = new PeerDetection(ip, port);
+        PeerDetection detect   = new PeerDetection(ip, port, peer);
         detect.start();
         
-        Thread.sleep(4000);
+        Hello sendHello = new Hello(ip, port, node);
+        
+       
+       
+        
+         Runnable helloRunnable = new Runnable() {
+                public void run() {
+                    try {
+                        sendHello.send();
+                    } catch (IOException ex) {
+                        Logger.getLogger(TpAER.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                   // sendHello.close();
+                }
+            };
          
-        
-        Hello sendHello = new Hello(ip, port);
-        sendHello.send();
-        sendHello.close();
-        
-        
+         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+            executor.scheduleAtFixedRate(helloRunnable, 0, 5, TimeUnit.SECONDS);
+
         
         
         
@@ -94,6 +118,8 @@ public class TpAER {
         
         if (num==2){
             
+            
+            peer.showPeers();
       
             
           
