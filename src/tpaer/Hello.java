@@ -16,7 +16,7 @@ import java.net.SocketException;
  *
  * @author ccdann
  */
-public class Server {
+public class Hello {
     
     private DatagramSocket serverSocket;
     
@@ -26,7 +26,7 @@ public class Server {
     
    
     
-    public Server(String ip, int port) throws SocketException, IOException{
+    public Hello(String ip, int port) throws SocketException, IOException{
         this.ip = ip;
         this.port = port;
         // socket used to send
@@ -36,7 +36,7 @@ public class Server {
     public void send() throws IOException{
        
         // make datagram packet
-        byte[] message = ("Multicasting...").getBytes();
+        byte[] message = ("Hello").getBytes();
         
         
         DatagramPacket packet = new DatagramPacket(message, message.length, 

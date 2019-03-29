@@ -34,11 +34,27 @@ public class TpAER {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException, SocketException {
+    public static void main(String[] args) throws IOException, SocketException, InterruptedException {
+        
+        System.out.print(InetAddress.getLocalHost().getHostName());
         
         
-        //ClientTh clientTh   = new ClientTh();
-        //clientTh.run();
+         final String ip = "ff02::1";
+         final int port = 9999;
+        
+        PeerDetection detect   = new PeerDetection(ip, port);
+        detect.start();
+        
+        Thread.sleep(4000);
+         
+        
+        Hello sendHello = new Hello(ip, port);
+        sendHello.send();
+        sendHello.close();
+        
+        
+        
+        
         
         
      
@@ -57,7 +73,7 @@ public class TpAER {
         
         if (num==1){ 
             
-            
+            /*
             
                 System.out.println("Init Client......");
                 try {
@@ -70,6 +86,7 @@ public class TpAER {
                 ex.printStackTrace();
 
             }
+            */
                 
          }
             
@@ -79,17 +96,7 @@ public class TpAER {
             
       
             
-            
-              System.out.println("Init Server......");
-               try {
-                final String ip = "ff02::1";
-                final int port = 9999;
-                Server server = new Server(ip, port);
-                server.send();
-                server.close();
-         } catch (IOException ex) {
-        ex.printStackTrace();
-         }
+          
         }
         
          if (num==3){   
