@@ -5,29 +5,22 @@
  */
 package tpaer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Inet6Address;
+import java.io.InputStreamReader;
+import static java.lang.System.exit;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
-import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Scanner;
-import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,17 +33,21 @@ import java.util.logging.Logger;
  * @author ccdann
  */
 public class TpAER {
+    
+   
 
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
+     * @throws java.text.ParseException
      */
-    public static void main(String[] args) throws IOException, SocketException, InterruptedException, ParseException {
-        PeerDetectionListener peer = new PeerDetectionListener();
-        
-        
-        
-
-        String node = InetAddress.getLocalHost().getHostName();
+    public static void main(String[] args) throws IOException, InterruptedException, ParseException {
+       
+        int num =0;
+       List<Node> peer = new ArrayList<Node>();
+       String node = InetAddress.getLocalHost().getHostName();
+        peer.add(new Node(node, "0", "0", "0",0,0)); 
         
          final String ip = "ff02::1";
          final int port = 9999;
@@ -58,14 +55,11 @@ public class TpAER {
         PeerDetection detect   = new PeerDetection(ip, port, peer);
         detect.start();
         
-        Hello sendHello = new Hello(ip, port, node);
-        
-       
-       
+        Hello sendHello = new Hello(ip, port, node);    
         
          Runnable helloRunnable = new Runnable() {
                 public void run() {
-                    try {
+                    try { 
                         sendHello.send();
                     } catch (IOException ex) {
                         Logger.getLogger(TpAER.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,53 +71,36 @@ public class TpAER {
          ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
             executor.scheduleAtFixedRate(helloRunnable, 0, 5, TimeUnit.SECONDS);
 
-        
-        
-        
-        
-     
 
           
-        System.out.println("Press 1 Client or Press 2 Server");
+        System.out.println("Press to show table");
 
         
-        
-        Scanner scan= new Scanner(System.in);
+        boolean stop = false;
+       BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) );
 
-        
-        int num= scan.nextInt();
-        
-        
-        
-        if (num==1){ 
-            
-            /*
-            
-                System.out.println("Init Client......");
-                try {
-                final String ip = "ff02::1";
-                final int port = 9999;
-                Client client = new Client(ip, port);
-                client.printMessage();
-                client.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        while( !stop )
+        {
+          System.out.println( "enter \"0\" to exit");
+          String s = br.readLine();
 
+          if( s.equals( "0" ) )
+          {
+            System.out.print( "Closing down..." );
+            detect.stop();
+            System.out.println( " done" );
+            exit(0);
+          }else{
+  
+              for (int i = 0; i < peer.size(); i++) {
+                System.out.println(peer.get(i).getDstid() + " " + peer.get(i).getIdnexthop() + " " +peer.get(i).getDist()+ " "+ peer.get(i).getCost());
+           
             }
-            */
-                
-         }
-            
+ 
+          }
         
-        
-        if (num==2){
-            
-            
-            peer.showPeers();
-      
-            
-          
         }
+       
         
          if (num==3){   
          //   Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
@@ -147,14 +124,7 @@ public class TpAER {
 		for (int i = 0; i < mac.length; i++) {
 			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
 		}
-	     System.out.println(sb.toString());
-           
-             
-             
-             
-            
-            
-            
+	     System.out.println(sb.toString()); 
          }
         
         
@@ -189,10 +159,7 @@ public class TpAER {
                 System.out.printf("%n");
          }
         
-        
-        
-   
-        
+
     }
     
   
