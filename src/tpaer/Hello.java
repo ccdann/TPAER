@@ -28,18 +28,18 @@ public class Hello extends TimerTask {
     
    
     
-    public Hello(String ip, int port, String node) throws SocketException, IOException{
+    public Hello(String ip, int port) throws SocketException, IOException{
         this.ip = ip;
         this.port = port;
-        this.node = node;
+        
         // socket used to send
         serverSocket = new DatagramSocket();
     }
     
-    public void send() throws IOException{
+    public void send(String pdu) throws IOException{
        
         // make datagram packet
-        byte[] message = (Settings.HELLO + node).getBytes();
+        byte[] message = (pdu).getBytes();
         
         
         DatagramPacket packet = new DatagramPacket(message, message.length, 
@@ -48,20 +48,6 @@ public class Hello extends TimerTask {
         serverSocket.send(packet);
     }
     
-    
-    
-       public void sendhop2(HashMap peersList) throws IOException{
-       
-        // make datagram packet
-        byte[] message = (peersList.toString().getBytes());
-        
-        
-        DatagramPacket packet = new DatagramPacket(message, message.length, 
-            InetAddress.getByName(ip), port);
-        // send packet
-        serverSocket.send(packet);
-        
-        }
     
     public void close(){
         serverSocket.close();

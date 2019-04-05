@@ -5,6 +5,7 @@
  */
 package tpaer;
 
+import com.google.gson.Gson;
 import java.io.BufferedReader;
 
 import java.io.IOException;
@@ -45,22 +46,37 @@ public class TpAER {
     public static void main(String[] args) throws IOException, InterruptedException, ParseException {
        
         int num =0;
-       List<Node> peer = new ArrayList<Node>();
-       String node = InetAddress.getLocalHost().getHostName();
-        peer.add(new Node(node, "0", "0", "0",0,0)); 
-        
+       String localnode = InetAddress.getLocalHost().getHostName();
+      
          final String ip = "ff02::1";
          final int port = 9999;
+         
+         
+         PDU pduhello = new PDU();
+         pduhello.setType("Hello");
+         pduhello.setIdnode("n1");
+         ArrayList<String> neighbors = new ArrayList<>(10);
+         neighbors.add("n2");
+         neighbors.add("n3");
+         
+         pduhello.setNeighbors(neighbors);
+
         
-        PeerDetection detect   = new PeerDetection(ip, port, peer);
+         Gson gson = new Gson();
+         System.out.println(gson.toJson(pduhello));
+         
+         
+        PeerDetection detect   = new PeerDetection(ip, port);
         detect.start();
         
-        Hello sendHello = new Hello(ip, port, node);    
+        //O hello tem de ser criado antes de ser enviado
+        
+        Hello sendHello = new Hello(ip, port);    
         
          Runnable helloRunnable = new Runnable() {
                 public void run() {
                     try { 
-                        sendHello.send();
+                        sendHello.send(gson.toJson(pduhello));
                     } catch (IOException ex) {
                         Logger.getLogger(TpAER.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -92,14 +108,14 @@ public class TpAER {
             exit(0);
           }else{
   
-              for (int i = 0; i < peer.size(); i++) {
-                System.out.println(peer.get(i).getDstid() + " " + peer.get(i).getIdnexthop() + " " +peer.get(i).getDist()+ " "+ peer.get(i).getCost());
+             // for (int i = 0; i < peer.size(); i++) {
+             //   System.out.println(peer.get(i).getDstid() + " " + peer.get(i).getIdnexthop() + " " +peer.get(i).getDist()+ " "+ peer.get(i).getCost());
            
             }
  
           }
         
-        }
+        
        
         
          if (num==3){   
@@ -131,7 +147,7 @@ public class TpAER {
         
         
     
-    }      
+    }  
         
         private static void displayInterfaceInformation(NetworkInterface netint) throws SocketException {
                 System.out.printf("Display name: %s%n", netint.getDisplayName());
