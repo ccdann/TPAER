@@ -36,6 +36,10 @@ public class PeerDetection extends Thread {
 	private DatagramSocket clientSocket;
 	private InetAddress IPAddress;
         private final MulticastSocket socket;
+        private String localnode;
+        ArrayList<String> neighbors = new ArrayList<>(10);
+        Node node;
+        List<RoutingTable> rt;
 
         
             
@@ -43,15 +47,20 @@ public class PeerDetection extends Thread {
      *
      * @param ip
      * @param port
+     * @param localnode
+     * @param neighbors
+     * @param rt
      * @param peer
      * @throws SocketException
      * @throws UnknownHostException
      * @throws IOException
      */
-    public PeerDetection(String ip, int port) throws SocketException, UnknownHostException, IOException{                
+    public PeerDetection(String ip, int port, String localnode, ArrayList<String> neighbors, List<RoutingTable> rt) throws SocketException, UnknownHostException, IOException{                
                 socket = new MulticastSocket(port);
                 socket.joinGroup(InetAddress.getByName(ip));
-                
+                this.localnode = localnode;  
+                this.neighbors = neighbors;
+                this.rt = rt;
 	}
 
 
@@ -75,31 +84,70 @@ public class PeerDetection extends Thread {
                                 //long receivedTime = System.nanoTime() - t1;
                                                              
                                 String msg = new String( packet.getData(), packet.getOffset(), packet.getLength() );
-                                System.out.println("MSG "+ msg);
+                                
                                 
                                 Gson gson = new Gson();
                                 PDU pdu = gson.fromJson(msg,PDU.class);
                                    
+                                    //para nao adicionar nele mesmo
+                                if(!localnode.contains(pdu.getIdnode())){
+                                    System.out.println("MSG " + msg);
+                                    //Se nao contiver nos vizinhos insere o pduid
+                                    if(!neighbors.contains(pdu.getIdnode())){
+                                        neighbors.add(pdu.getIdnode()); 
+                                    }    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                 node = new Node();
+                                 node.setNode(pdu.getIdnode(), "");
+                                 node.setNextHop(pdu.getIdnode(), "");
+                                 node.setDist(1);
+                                 node.setCost(1);
+                                    
+                                }
                                 
                                 
-                                System.out.println(pdu.getIdnode());
-                                System.out.println(pdu.getNeighbors());
                                 
                                 
+                                //Add node
                                 
-                                //Adiciona no No
+                                if(!neighbors.isEmpty()){
+                                    //COmparacao e adiciona na routing table !! 
+                                    if(rt.isEmpty()){
+                                    rt.add(new RoutingTable(node,1)); 
+                                }
+                                }
+                                
+                                for(int i=0; i<rt.size();i++){
+                                if(!rt.get(i).node.getDstid().contains(node.getDstid())){
+                                    System.out.println("ADD repetido");
+                                    System.out.println("RT "+ rt.get(i).node.getDstid());
+                                    System.out.println("Node "+ node.getDstid());
+      
+                                    rt.add(new RoutingTable(node,1)); 
+                                }}
+                             
+                                
+                                if(!neighbors.isEmpty()){
+                                    //COmparacao e adiciona na routing table !! 
+                                    //rt.addNode(node);
+                                }
+                               
                                 
                                 
-                                //COmparacao e adiciona na routing table !!
-                                   
-          
-                            
+                      
 
 			} catch (IOException e) {
 				System.out.println("Exception Thrown: " + e.getLocalizedMessage());
 			}
 		}
 	}
+        
+        
         
         
 

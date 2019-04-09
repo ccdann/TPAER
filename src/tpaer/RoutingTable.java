@@ -9,10 +9,13 @@ package tpaer;
  *
  * @author ccdann
  */
-public class RoutingTable {
+ class RoutingTable {
     
     Node node;
     int dist;
+    
+    public RoutingTable(){
+    }
     
     public RoutingTable(Node node, int dist){
     this.node = node;
@@ -20,16 +23,34 @@ public class RoutingTable {
     }
       
     void addNode(Node node){
+    this.node = node;
+    }
     
+    public boolean verifyNode(Node node){
+        return this.node != null;
+    }
+    
+    public Node getNode(Node node){
+        return this.node;
     }
     
     void printTable(){
+        
+        System.out.println("Dest: " + node.getDstid() + " Dist: " + dist);
+       
     
     }
     
     void setNeighbor(int dist){
     
     }
+    
+    void addNeighbor(int dist){
+    
+    }
+    
+    //add neighbor
+    //set netigh
     
 }
 

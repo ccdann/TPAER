@@ -45,29 +45,31 @@ public class TpAER {
      */
     public static void main(String[] args) throws IOException, InterruptedException, ParseException {
        
-        int num =0;
-       String localnode = InetAddress.getLocalHost().getHostName();
+         int num =0;
+         String localnode = InetAddress.getLocalHost().getHostName();
       
          final String ip = "ff02::1";
          final int port = 9999;
          
+         //RoutingTable rt = new RoutingTable();
+         List<RoutingTable> rt = new ArrayList<>();
+        
          
          PDU pduhello = new PDU();
          pduhello.setType("Hello");
-         pduhello.setIdnode("n1");
+         pduhello.setIdnode(localnode);
          ArrayList<String> neighbors = new ArrayList<>(10);
-         neighbors.add("n2");
-         neighbors.add("n3");
-         
+         //neighbors.add("n2");
+         //neighbors.add("n3");
          pduhello.setNeighbors(neighbors);
 
         
          Gson gson = new Gson();
-         System.out.println(gson.toJson(pduhello));
+         //System.out.println(gson.toJson(pduhello));
          
          
-        PeerDetection detect   = new PeerDetection(ip, port);
-        detect.start();
+         PeerDetection detect   = new PeerDetection(ip, port,localnode, neighbors, rt);
+         detect.start();
         
         //O hello tem de ser criado antes de ser enviado
         
@@ -85,7 +87,7 @@ public class TpAER {
             };
          
          ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-            executor.scheduleAtFixedRate(helloRunnable, 0, 5, TimeUnit.SECONDS);
+         executor.scheduleAtFixedRate(helloRunnable, 0, 5, TimeUnit.SECONDS);
 
 
           
@@ -93,7 +95,7 @@ public class TpAER {
 
         
         boolean stop = false;
-       BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) );
+        BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) );
 
         while( !stop )
         {
@@ -108,8 +110,9 @@ public class TpAER {
             exit(0);
           }else{
   
-             // for (int i = 0; i < peer.size(); i++) {
-             //   System.out.println(peer.get(i).getDstid() + " " + peer.get(i).getIdnexthop() + " " +peer.get(i).getDist()+ " "+ peer.get(i).getCost());
+              for(RoutingTable rtr : rt) {
+                        System.out.println("Node:" + rtr.node.getDstid() +" Dist:" + rtr.dist);
+             }
            
             }
  

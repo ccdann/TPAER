@@ -23,7 +23,9 @@ import java.util.Set;
     private int dist;
     private long cost;
    
+    public Node(){
     
+    }
     public Node(String dstid, String dstip, String idNexthop, String ipNexthop, int dist, long cost){
                 this.dstid = dstid;
 		this.dstip = dstip;
@@ -62,6 +64,14 @@ import java.util.Set;
         public void setNextHop(String idNexthop, String ipNexthop) {
 		this.idNexthop = idNexthop;
                 this.ipNexthop = ipNexthop;
+	}
+        
+        public void setDist(int dist){
+		 this.dist = dist;
+	}
+        
+        public void setCost(int cost){
+		this.cost = cost;
 	}
 
 
