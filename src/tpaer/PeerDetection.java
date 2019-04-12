@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,7 +39,8 @@ public class PeerDetection extends Thread {
         private final MulticastSocket socket;
         private String localnode;
         ArrayList<String> neighbors = new ArrayList<>(10);
-        Node node;
+        
+        HashMap<String, Node> nodes = new HashMap<String, Node>();
         List<RoutingTable> rt;
 
         
@@ -89,54 +91,124 @@ public class PeerDetection extends Thread {
                                 Gson gson = new Gson();
                                 PDU pdu = gson.fromJson(msg,PDU.class);
                                    
-                                    //para nao adicionar nele mesmo
+                                      //Ignorar as mensagens do mesmo no
                                 if(!localnode.contains(pdu.getIdnode())){
+                                    
+                                     /*
+                                <!---Atenção !! Verificar os neighbors, porque quando estao 4 ou mais vizinhos de hop 1 há problema !!
+                                    
+                                     */
                                     System.out.println("MSG " + msg);
                                     //Se nao contiver nos vizinhos insere o pduid
                                     if(!neighbors.contains(pdu.getIdnode())){
                                         neighbors.add(pdu.getIdnode()); 
-                                    }    
+                                    } 
                                     
+                               
+                                //Inserir primeiro os de distancia 1    
+                                //Verifica na tabela 
+                                //{"type":"Hello","idnode":"n2","neighbors":["n1","n4"]
+                                /*
+                                <!--- Em primeiro adiciona o "idnode" com dist(hop) = 1
+                                <!--- Todos os restastes (Ex:neigbors têm de ser verificados!! -->
+                                <!--- É preciso verificar primeiro se o nó está na RT! 
+                                */
+                                
+                                
+                                
+                                for(int i=0; i<rt.size();i++){       
                                     
-                                    
-                                    
-                                    
-                                    
-                                 node = new Node();
-                                 node.setNode(pdu.getIdnode(), "");
-                                 node.setNextHop(pdu.getIdnode(), "");
-                                 node.setDist(1);
-                                 node.setCost(1);
-                                    
+                                
                                 }
                                 
+                                //ver se consigo adicionar e remover vizinhos (Keep Alive) ou TTL
+                                
+                                //Temporizador ! O tempo é atualizado a cada mensagem recebida ( Se passar o tempo máximo definido retira-se)
                                 
                                 
+                                    
+                                    
+                                 if(!nodes.containsKey(pdu.getIdnode())){                             
+                                    nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), "",pdu.getIdnode(), "",1,1));
+                                    rt.add(new RoutingTable(nodes.get(pdu.getIdnode()),1)); 
+                                 }
+                                 
+                                 
                                 
-                                //Add node
+                                 
+                                 //N1
+                                 //{"type":"Hello","idnode":"n2","neighbors":["n1","n4"]}
+                                 //Procura em todos os neighbors e adiciona em falta
+                                   for (Object neighbor : pdu.getNeighbors()) {
+                                       if(!nodes.containsKey(neighbor)){
+                                           //Para nao adicionar com distancia 2 o proprio no
+                                           if(!localnode.equals(neighbor)){
+                                               nodes.put(neighbor.toString(), new Node(neighbor.toString(), "",pdu.getIdnode(), "",2,1));
+                                               //se na tabela n contiver o X insere
+                                               boolean exists = verifyTable(nodes.get(neighbor.toString()));
+                                               
+                                               System.out.println(exists);
+
+                                                //if(!exists){
+                                               //rt.add(new RoutingTable(nodes.get(neighbor.toString()),2)); 
+                                               //}else{
+                                               //System.out.println("Existe na tabela");
+                                               //}
+                                              
+                                              
+                                           }
+                                       }    
+                                   }
+                                   
+                                   
                                 
-                                if(!neighbors.isEmpty()){
-                                    //COmparacao e adiciona na routing table !! 
-                                    if(rt.isEmpty()){
-                                    rt.add(new RoutingTable(node,1)); 
+                                   
+                            //Add node
+                                
+                              
+                                    //Inserir hop2, se na tabela contiver insere!!
+                                        
+                                    Set<Map.Entry<String, Node>> nodeset = nodes.entrySet();     
+                                        for(int i=0; i<rt.size();i++){          
+                                        for (Map.Entry<String, Node> nodesfor : nodeset) {
+                                        
+                                            if(!rt.get(i).node.getDstid().contains(nodesfor.getKey())){
+                                        
+                                         //System.out.println("Node" +rt.get(i).node.getDstid());
+                                         //System.out.println("Nodes key" +nodesfor.getKey());
+
+                                        //rt.add(new RoutingTable(nodesfor.getValue(),2)); 
+                                        }
+                                            
+                                            //System.out.print(nodesfor.getKey() + ": ");
+                                        }
+                                        
+                                        }
+
+                                   
                                 }
-                                }
                                 
+
+                                
+                                //System.out.println("Neigbors hop1" + neighbors);
+                                // System.out.println("Neigbors hop2" + pdu.getNeighbors());
+                                
+
+                                
+                                /*
                                 for(int i=0; i<rt.size();i++){
-                                if(!rt.get(i).node.getDstid().contains(node.getDstid())){
+                                if(!rt.get(i).node.getDstid().contains(nodes.getDstid())){
                                     System.out.println("ADD repetido");
                                     System.out.println("RT "+ rt.get(i).node.getDstid());
                                     System.out.println("Node "+ node.getDstid());
       
                                     rt.add(new RoutingTable(node,1)); 
                                 }}
+
+                                */
                              
                                 
-                                if(!neighbors.isEmpty()){
-                                    //COmparacao e adiciona na routing table !! 
-                                    //rt.addNode(node);
-                                }
-                               
+                              
                                 
                                 
                       
@@ -146,6 +218,18 @@ public class PeerDetection extends Thread {
 			}
 		}
 	}
+        
+        
+        public Boolean verifyTable(Node node){
+            Boolean value = false;
+            for(int i=0; i<rt.size();i++){ 
+                if(rt.get(i).node.getDstid().equals(node.getDstid())){
+                value = true;
+                }      
+            }
+            return value;
+        
+        }
         
         
         

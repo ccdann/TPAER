@@ -11,7 +11,16 @@ package tpaer;
  */
 public class Settings {
     
-       public static final String HELLO = "HELLOIM: ";
+       public static final String ip = "ff02::1";
+       public static final int port = 9999;
+       
+       //De x em x segundos envia uma mensagem;
+       public static final int secSendmsg = 5;
+       
+               
+       public static final String HELLO = "hello";
+       public static final int TTL = 30;
+       
        
     
 }

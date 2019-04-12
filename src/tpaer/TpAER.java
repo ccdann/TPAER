@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author ccdann
  */
-public class TpAER {
+public class TpAER extends Settings {
     
    
 
@@ -48,15 +48,14 @@ public class TpAER {
          int num =0;
          String localnode = InetAddress.getLocalHost().getHostName();
       
-         final String ip = "ff02::1";
-         final int port = 9999;
+   
          
          //RoutingTable rt = new RoutingTable();
          List<RoutingTable> rt = new ArrayList<>();
         
          
          PDU pduhello = new PDU();
-         pduhello.setType("Hello");
+         pduhello.setType(HELLO);
          pduhello.setIdnode(localnode);
          ArrayList<String> neighbors = new ArrayList<>(10);
          //neighbors.add("n2");
@@ -75,19 +74,17 @@ public class TpAER {
         
         Hello sendHello = new Hello(ip, port);    
         
-         Runnable helloRunnable = new Runnable() {
-                public void run() {
-                    try { 
-                        sendHello.send(gson.toJson(pduhello));
-                    } catch (IOException ex) {
-                        Logger.getLogger(TpAER.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                   // sendHello.close();
-                }
-            };
+         Runnable helloRunnable = () -> {
+             try {
+                 sendHello.send(gson.toJson(pduhello));
+             } catch (IOException ex) {
+                 Logger.getLogger(TpAER.class.getName()).log(Level.SEVERE, null, ex);
+             }
+             // sendHello.close();
+         };
          
          ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-         executor.scheduleAtFixedRate(helloRunnable, 0, 5, TimeUnit.SECONDS);
+         executor.scheduleAtFixedRate(helloRunnable, 0, secSendmsg, TimeUnit.SECONDS);
 
 
           
@@ -109,7 +106,7 @@ public class TpAER {
             System.out.println( " done" );
             exit(0);
           }else{
-  
+              System.out.println("----------" + localnode + "-----------");
               for(RoutingTable rtr : rt) {
                         System.out.println("Node:" + rtr.node.getDstid() +" Dist:" + rtr.dist);
              }
