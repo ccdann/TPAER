@@ -5,8 +5,11 @@
  */
 package tpaer;
 
+
+
 import com.google.gson.Gson;
 import java.io.BufferedReader;
+import tpaer.FileTransfer.*;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -96,6 +99,7 @@ public class TpAER extends Settings {
 
         while( !stop )
         {
+          System.out.println( "1-SendFile 2-ReceiveFile");  
           System.out.println( "enter \"0\" to exit");
           String s = br.readLine();
 
@@ -105,13 +109,40 @@ public class TpAER extends Settings {
             detect.stop();
             System.out.println( " done" );
             exit(0);
-          }else{
+          }
+          
+          
+          if( s.equals( "1" ) )
+          {
+            System.out.print( "Send File..." );
+            
+            Client clientFT = new Client("2001::2");
+            clientFT.tranferfile();
+            
+            
+          }
+          
+          if( s.equals( "2" ) )
+          {
+            System.out.print( "Receive File..." );
+            
+            Server serverFT = new Server();
+            serverFT.receivefile();
+            
+          }
+          
+          
+         /*
+          
+          else{
               System.out.println("----------" + localnode + "-----------");
               for(RoutingTable rtr : rt) {
                         System.out.println("Node:" + rtr.node.getDstid() +" Dist:" + rtr.dist);
              }
            
             }
+          
+          */
  
           }
         

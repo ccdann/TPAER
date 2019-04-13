@@ -46,12 +46,16 @@ import java.util.List;
     
     public String getIdnode() {
 		return this.idnode;
-	}
+    }
     
     public ArrayList getNeighbors() {
                 return this.neighbors;
     }
 
+    public void setTTL(){
+    
+    
+    }
     
 
 

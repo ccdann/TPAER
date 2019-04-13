@@ -16,12 +16,12 @@ import java.util.concurrent.TimeUnit;
  *
  * @author ccdann
  */
-public class Client {
+public class ClientTEST {
     
     private MulticastSocket socket;
  
     
-    public Client(String ip, int port) throws IOException {
+    public ClientTEST(String ip, int port) throws IOException {
         
         // important that this is a multicast socket
         socket = new MulticastSocket(port);

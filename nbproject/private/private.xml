@@ -2,6 +2,14 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/ccdann/NetBeansProjects/TPAER/src/tpaer/PeerDetection.java</file>
+            <file>file:/home/ccdann/NetBeansProjects/TPAER/src/tpaer/FileTransfer/Client.java</file>
+            <file>file:/home/ccdann/NetBeansProjects/TPAER/src/tpaer/PDU.java</file>
+            <file>file:/home/ccdann/NetBeansProjects/TPAER/src/tpaer/FileTransfer/Server.java</file>
+            <file>file:/home/ccdann/NetBeansProjects/TPAER/src/tpaer/TpAER.java</file>
+            <file>file:/home/ccdann/NetBeansProjects/TPAER/src/tpaer/Settings.java</file>
+            <file>file:/home/ccdann/NetBeansProjects/TPAER/src/tpaer/Node.java</file>
+        </group>
     </open-files>
 </project-private>
