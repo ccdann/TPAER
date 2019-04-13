@@ -96,7 +96,7 @@ public class PeerDetection extends Thread {
                 //Ignorar as mensagens do mesmo no
                 if (!localnode.contains(pdu.getIdnode())) {
 
-                    System.out.println("MSG " + msg);
+                    //System.out.println("MSG " + msg);
 
                     /*
                                 <!---Atenção !! Verificar os neighbors, porque quando estao 4 ou mais vizinhos de hop 1 há problema !!

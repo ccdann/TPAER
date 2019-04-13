@@ -65,8 +65,7 @@ public class TpAER extends Settings {
          //neighbors.add("n3");
          pduhello.setNeighbors(neighbors);
          
-         //TESTE !!!!!!!!!! GITTTT
-
+        
         
          Gson gson = new Gson();
          //System.out.println(gson.toJson(pduhello));
@@ -101,7 +100,7 @@ public class TpAER extends Settings {
 
         while( !stop )
         {
-          System.out.println( "1-SendFile 2-ReceiveFile");  
+          System.out.println( "2-SendFile 1-ReceiveFile");  
           System.out.println( "enter \"0\" to exit");
           String s = br.readLine();
 
@@ -116,20 +115,20 @@ public class TpAER extends Settings {
           
           if( s.equals( "1" ) )
           {
-            System.out.print( "Send File..." );
+            System.out.print( "Receive File..." );
             
-            Client clientFT = new Client("2001::2");
-            clientFT.tranferfile();
+            Client clientFT = new Client("127.0.0.1");
+            clientFT.receivefile();
             
             
           }
           
           if( s.equals( "2" ) )
           {
-            System.out.print( "Receive File..." );
+            System.out.print( "Send File..." );
             
             Server serverFT = new Server();
-            serverFT.receivefile();
+            serverFT.sendfile();
             
           }
           
