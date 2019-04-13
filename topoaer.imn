@@ -1,0 +1,204 @@
+node n1 {
+    type router
+    model mdr
+    network-config {
+	hostname n1
+	!
+	interface eth0
+	 ip address 10.0.0.1/32
+	 ipv6 address 2001:0::1/128
+	!
+    }
+    canvas c1
+    iconcoords {124.0 98.0}
+    labelcoords {124.0 130.0}
+    interface-peer {eth0 n8}
+}
+
+node n2 {
+    type router
+    model mdr
+    network-config {
+	hostname n2
+	!
+	interface eth0
+	 ip address 10.0.0.2/32
+	 ipv6 address 2001:0::2/128
+	!
+    }
+    canvas c1
+    iconcoords {253.0 98.0}
+    labelcoords {253.0 130.0}
+    interface-peer {eth0 n8}
+}
+
+node n3 {
+    type router
+    model mdr
+    network-config {
+	hostname n3
+	!
+	interface eth0
+	 ip address 10.0.0.3/32
+	 ipv6 address 2001:0::3/128
+	!
+    }
+    canvas c1
+    iconcoords {203.0 196.0}
+    labelcoords {203.0 228.0}
+    interface-peer {eth0 n8}
+}
+
+node n4 {
+    type router
+    model mdr
+    network-config {
+	hostname n4
+	!
+	interface eth0
+	 ip address 10.0.0.4/32
+	 ipv6 address 2001:0::4/128
+	!
+    }
+    canvas c1
+    iconcoords {422.0 206.0}
+    labelcoords {422.0 238.0}
+    interface-peer {eth0 n8}
+}
+
+node n5 {
+    type router
+    model mdr
+    network-config {
+	hostname n5
+	!
+	interface eth0
+	 ip address 10.0.0.5/32
+	 ipv6 address 2001:0::5/128
+	!
+    }
+    canvas c1
+    iconcoords {350.0 359.0}
+    labelcoords {350.0 391.0}
+    interface-peer {eth0 n8}
+}
+
+node n6 {
+    type router
+    model mdr
+    network-config {
+	hostname n6
+	!
+	interface eth0
+	 ip address 10.0.0.6/32
+	 ipv6 address 2001:0::6/128
+	!
+    }
+    canvas c1
+    iconcoords {544.0 326.0}
+    labelcoords {544.0 358.0}
+    interface-peer {eth0 n8}
+}
+
+node n7 {
+    type router
+    model mdr
+    network-config {
+	hostname n7
+	!
+	interface eth0
+	 ip address 10.0.0.7/32
+	 ipv6 address 2001:0::7/128
+	!
+    }
+    canvas c1
+    iconcoords {720.0 356.0}
+    labelcoords {720.0 388.0}
+    interface-peer {eth0 n8}
+}
+
+node n8 {
+    type wlan
+    network-config {
+	hostname wlan8
+	!
+	interface wireless
+	 ip address 10.0.0.0/32
+	 ipv6 address 2001:0::0/128
+	!
+	mobmodel
+	coreapi
+	basic_range
+	!
+    }
+    custom-config {
+	custom-config-id basic_range
+	custom-command {3 3 9 9 9}
+	config {
+	range=275
+	bandwidth=54000000
+	jitter=0
+	delay=20000
+	error=0
+	}
+    }
+    canvas c1
+    iconcoords {753.0 553.0}
+    labelcoords {753.0 585.0}
+    interface-peer {e0 n1}
+    interface-peer {e1 n2}
+    interface-peer {e2 n3}
+    interface-peer {e3 n4}
+    interface-peer {e4 n5}
+    interface-peer {e5 n6}
+    interface-peer {e6 n7}
+}
+
+link l1 {
+    nodes {n8 n1}
+}
+
+link l2 {
+    nodes {n8 n2}
+}
+
+link l3 {
+    nodes {n8 n3}
+}
+
+link l4 {
+    nodes {n8 n4}
+}
+
+link l5 {
+    nodes {n8 n5}
+}
+
+link l6 {
+    nodes {n8 n6}
+}
+
+link l7 {
+    nodes {n8 n7}
+}
+
+canvas c1 {
+    name {Canvas1}
+}
+
+option global {
+    interface_names no
+    ip_addresses yes
+    ipv6_addresses yes
+    node_labels yes
+    link_labels yes
+    show_api no
+    background_images no
+    annotations yes
+    grid yes
+    traffic_start 0
+}
+
+option session {
+}
+
