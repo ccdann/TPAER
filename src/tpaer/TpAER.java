@@ -64,6 +64,8 @@ public class TpAER extends Settings {
          //neighbors.add("n2");
          //neighbors.add("n3");
          pduhello.setNeighbors(neighbors);
+         
+         //TESTE !!!!!!!!!! GIT
 
         
          Gson gson = new Gson();
