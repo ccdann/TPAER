@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import static tpaer.Settings.secSendmsg;
 
 /**
  *
@@ -47,10 +48,11 @@ public class PeerDetection extends Thread{
     ArrayList<String> neighborsip = new ArrayList<>(10);
     long t1 = System.nanoTime();
     long t2 = System.nanoTime();
-    
+    int cont = 0;
     long elapsedTimeInSeconds = (t2 - t1) / 1000000000;
 
     HashMap<String, Node> nodes = new HashMap<String, Node>();
+            
     List<RoutingTable> rt =  new ArrayList<RoutingTable>();
 
     /**
@@ -73,6 +75,7 @@ public class PeerDetection extends Thread{
         this.neighbors = neighbors;
         this.neighborsip = neighborsip;
         this.rt = rt;
+       
     }
 
     private void shutdown() {
@@ -82,8 +85,8 @@ public class PeerDetection extends Thread{
     @Override
     public void run() {
         System.out.println("PeerDiscovery started....");
-
-        while (true) {
+        nodes.put(localnode, new Node(localnode, "", localnode, "",0,1,System.nanoTime()));
+        while (true) {   
             try {
 
                 byte[] message = new byte[256];
@@ -105,24 +108,25 @@ public class PeerDetection extends Thread{
                            
                  */
                 //Ignorar as mensagens do mesmo no
+                
+            
+                    
+                    
                 if (!localnode.contains(pdu.getIdnode())) {
 
-                    System.out.println("MSG " + msg);
-
+                    //System.out.println("MSG " + msg);
+                    //System.out.println("Neigh " + neighbors);
                     /*
-                                <!---Atenção !! Verificar os neighbors, porque quando estao 4 ou mais vizinhos de hop 1 há problema !!
+                    <!---Atenção !! Verificar os neighbors, porque quando estao 4 ou mais vizinhos de hop 1 há problema !!
                                     
                      */
                     //Se nao contiver nos vizinhos insere o pduid
                     if (!neighbors.contains(pdu.getIdnode())) {
                         neighbors.add(pdu.getIdnode());
                         neighborsip.add(pdu.getIpnode());
-                        //30 Seconds ttl
-                        
+                        //Algo para refresh dos neighbors
                     }
 
-                    //Inserir primeiro os de distancia 1    
-                    //Verifica na tabela 
                     //{"type":"Hello","idnode":"n2","neighbors":["n1","n4"]
                     /*
                                 <!--- Em primeiro adiciona o "idnode" com dist(hop) = 1
@@ -130,42 +134,40 @@ public class PeerDetection extends Thread{
                                 <!--- É preciso verificar primeiro se o nó está na RT! 
                     */
                     
-                    //Inserir node e ttl
-                    //adicionar na tabela de routing 
-                    //update da tabela routing 
-                    //
-                    
-                    
-                   nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), "", pdu.getIdnode(), "", 1, 1,System.nanoTime()));
+                   nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), "", pdu.getIdnode(), "", 1, 1,System.nanoTime()));                
+                   
+                   
                   
-                   // if (!nodes.containsKey(pdu.getIdnode())) { 
-                   //     rt.add(new RoutingTable(nodes.get(pdu.getIdnode()), 1));
-                   // }
-                   
-                   
-                   if(rt.isEmpty()){
+                   if(rt.isEmpty()){   
+                      rt.add(new RoutingTable(nodes.get(localnode), 0));
                       rt.add(new RoutingTable(nodes.get(pdu.getIdnode()), 1));
                    }
-                   
-              
+   
                  // HOP1
                  //Procura e insere
-                 RoutingTable exists = rt.stream()
-                .filter(node -> pdu.getIdnode().equals(node.node.getDstid()))
-                .findAny()
-                .orElse(null);
+
                  
-                 if(exists == null){
-                     //add
-                     rt.add(new RoutingTable(nodes.get(pdu.getIdnode()), 1));
-                 }else{
-                     //update ttl
-                      for (int i = 0; i < rt.size(); i++) {
-                         if(rt.get(i).node.getDstid().equals(pdu.getIdnode()))
-                        rt.set(i, new RoutingTable(nodes.get(pdu.getIdnode()), 1));
-                      }        
-                 }
-                     
+                    RoutingTable exists = rt.stream()
+                   .filter(node -> pdu.getIdnode().equals(node.node.getDstid()))
+                   .findAny()
+                   .orElse(null);
+
+                    if(exists == null){
+                        //add dist 1
+                        rt.add(new RoutingTable(nodes.get(pdu.getIdnode()), 1));
+                        
+                        
+                    }else{
+                        //update ttl
+                         for (int i = 0; i < rt.size(); i++) {
+                            if(rt.get(i).node.getDstid().equals(pdu.getIdnode()))
+                           rt.set(i, new RoutingTable(nodes.get(pdu.getIdnode()), 1));
+                         }        
+                    }
+                 
+                    cont ++;
+                    
+                    if(cont >= 10){
           
                     //DIST = 2
                      
@@ -173,64 +175,34 @@ public class PeerDetection extends Thread{
                     //{"type":"Hello","idnode":"n2","neighbors":["n1","n4"]}
                     //Procura em todos os neighbors e adiciona em falta
                     for (Object neighbor : pdu.getNeighbors()) {
-                        if (!nodes.containsKey(neighbor)) {  
+                         if(!localnode.contains(neighbor.toString())){
                              nodes.put(neighbor.toString(), new Node(neighbor.toString(), "", pdu.getIdnode(), pdu.getIpnode(), 2, 1,System.nanoTime()));
-                            //Para nao adicionar com distancia 2 o proprio no
-                            System.out.println("1");
-                            if (!localnode.equals(neighbor)) {
-                                   
-                                System.out.println("2");
-                                
-                                updateTableOptimized(neighbor.toString());
-                                 
-                            }
-                        }else{
-                        nodes.put(neighbor.toString(), new Node(neighbor.toString(), "", pdu.getIdnode(), pdu.getIpnode(), 2, 1,System.nanoTime()));
-                        updateTableOptimized(neighbor.toString());
-                        
+                             //updateTableOptimized(neighbor.toString(),2, pdu);  
+                         }
+                         
+                         if (nodes.containsKey(neighbor.toString())) {   
+                             updateTableOptimized(neighbor.toString(),2,pdu);   
+    
                         }
-                    }
-
-                    /*
-                    //Add node
-                    //Inserir hop2, se na tabela contiver insere!!
-                    Set<Map.Entry<String, Node>> nodeset = nodes.entrySet();
-                    for (int i = 0; i < rt.size(); i++) {
-                        for (Map.Entry<String, Node> nodesfor : nodeset) {
-
-                           // if (!rt.get(i).node.getDstid().contains(nodesfor.getKey())) {
-
-                                //System.out.println("Node" +rt.get(i).node.getDstid());
-                                //System.out.println("Nodes key" +nodesfor.getKey());
-                                //rt.add(new RoutingTable(nodesfor.getValue(),2)); 
-                            //}
-
-                            //System.out.print(nodesfor.getKey() + ": ");
-                        }
-
-                    }
-                    */
-
-                }
+                         
                 
-                
-                //Verificar e otimizar a remocao de peers da table !!
-                    //Node is alive?
+                    }
+                    }
+                    
+                    
+                    //DIST = 3
+                    //node contains hop =2 return rt;
+                    
                    
-                        Set<Map.Entry<String, Node>> nodeset = nodes.entrySet();  
-                        for (Map.Entry<String, Node> nodesfor : nodeset) {
-                            long ttl = (System.nanoTime() - nodesfor.getValue().getTTL()) / 1000000000;                    
-                              if(ttl > Settings.TTL)  {
-                                nodes.remove(nodesfor.getKey());
-                                }  
-                              
-                            //   System.out.println("Nodes " + nodesfor.getValue().getDstid() + " TTL " + (System.nanoTime()-nodesfor.getValue().getTTL())/ 1000000000);
-                           }
-                
-                        
+                    
+                    
+                    
+                    
+                    
+                }          
                         // Verifica e remove da RT TTL
                          
-                        for (int i = 0; i < rt.size(); i++) {
+                        for (int i = 1; i < rt.size(); i++) {
                                 long ttl = (System.nanoTime() - rt.get(i).node.getTTL() ) / 1000000000;
                                 // System.out.println("TTL " + ttl);
                                 if(ttl > Settings.TTL)  {
@@ -238,82 +210,96 @@ public class PeerDetection extends Thread{
                                 }        
                             }
 
-                //System.out.println("Neigbors hop1" + neighbors);
-                // System.out.println("Neigbors hop2" + pdu.getNeighbors());
-                /*
-                                for(int i=0; i<rt.size();i++){
-                                if(!rt.get(i).node.getDstid().contains(nodes.getDstid())){
-                                    System.out.println("ADD repetido");
-                                    System.out.println("RT "+ rt.get(i).node.getDstid());
-                                    System.out.println("Node "+ node.getDstid());
-      
-                                    rt.add(new RoutingTable(node,1)); 
-                                }}
-
-                 */
             } catch (IOException e) {
                 System.out.println("Exception Thrown: " + e.getLocalizedMessage());
             }
-        }
+            
+            //cuidado apagar
+            
+            /*new java.util.Timer().schedule( 
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            cont = 10;
+                        }
+                    }, 
+                    5000 
+            );
+            */
+            
+        } 
     }
 
-    public Boolean verifyTable(Node node) {
-        Boolean value = false;
-        for (int i = 0; i < rt.size(); i++) {
-            if (rt.get(i).node.getDstid().equals(node.getDstid())) {
-                value = true;
-            }
-        }
-        return value;
+    public RoutingTable verifyTable(String id) {
+              RoutingTable existshop1 = rt.stream()
+                                                .filter(node -> id.equals(node.node.getDstid()))
+                                                .findAny()
+                                                .orElse(null);
+                                                 //System.out.println(existshop1);   
+        return existshop1;
 
     }
     
-    public void updateTableOptimized(String name){
+ 
+    
+    public void updateTableOptimized(String name, int dist, PDU pdu){
         
         if (!localnode.equals(name)) {
-            for (int j = 0; j < rt.size(); j++) {
-                
-                //verifica se contem ( esta aqui o erro)
-            //    if(!rt.get(j).node.getDstid().contains(name)){
-             //       System.out.println("ADD 1");  
-              //      rt.add(new RoutingTable(nodes.get(name), 2));
-               // }
-                
-                RoutingTable exists = rt.stream()
+            
+            RoutingTable exists = rt.stream()
                 .filter(node -> name.equals(node.node.getDstid()))
                 .findAny()
                 .orElse(null);
-                 
+
                  if(exists == null){
-                     //add
-                     rt.add(new RoutingTable(nodes.get(name), 2));
-                 }
-                
-                if(rt.get(j).node.getDist() == 2  ){
-
-                        RoutingTable existshop1 = rt.stream()
-                                                .filter(node -> name.equals(node.node.getDstid()))
-                                                .findAny()
-                                                .orElse(null);
-                                                 System.out.println(existshop1);              
-
-                                                 if(existshop1 == null){
-                                                     //add
-                                                     System.out.println("ADD 2");  
-                                                     rt.add(new RoutingTable(nodes.get(name), 2));
-                                                 }else{
-                                                     System.out.println("UPDATE");  
-                                                     //update ttl
-                                                      for (int i = 0; i < rt.size(); i++) {
-                                                         if(rt.get(i).node.getDstid().equals(name))
-                                                        rt.set(i, new RoutingTable(nodes.get(name), 2));
-                                                      }        
-                                                 }
-                                 
-                                 }
+                     System.out.println("ADD 1 " + nodes.get(name).getDstid() +" D " + nodes.get(name).getDist());    
+                     rt.add(new RoutingTable(nodes.get(name), dist)); 
+                 }else{
+                    if(exists.node.getDist() == dist){  
+                                          for (int i = 0; i < rt.size(); i++) {
+                                                                   if(rt.get(i).node.getDstid().equals(exists.node.getDstid())){           
+                                                                   //   System.out.println("Update " + nodes.get(name).getDstid());  
+                                                                      rt.set(i, new RoutingTable(nodes.get(name), dist));   
+                                                                   }
+                                           } 
+                                          
+                                          }             
+                    }       
         }
 
-        }
+                 
     }
+      
+          
+ }
 
-}
+
+
+/*
+
+       for (int j = 0; j < rt.size(); j++) { 
+                              if(rt.get(j).node.getDist() == dist){
+                                  //System.out.println("UPDATE 2" + rt.get(j).node.getDstid());
+                                      RoutingTable existshop1 = rt.stream()
+                                                              .filter(node -> name.equals(node.node.getDstid()))
+                                                              .findAny()
+                                                              .orElse(null);
+                                                               System.out.println("EXIST " + existshop1.node.getDstid());              
+
+                                                               if(existshop1.node.getDist() == dist){
+                                                                 for (int i = 0; i < rt.size(); i++) {
+                                                                      if(rt.get(i).node.getDstid().equals(existshop1.node.getDstid()))
+                                                                     System.out.println("Update " + nodes.get(name).getDstid());  
+                                                                      rt.set(i, new RoutingTable(nodes.get(name), dist));                                                      
+                                                                    } 
+                                                               }
+                                               }
+
+                       }
+
+
+
+
+
+
+*/

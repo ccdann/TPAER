@@ -18,6 +18,7 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 
 import java.util.ArrayList;
@@ -50,8 +51,11 @@ public class TpAER extends Settings {
        
          int num =0;
          String localnode = InetAddress.getLocalHost().getHostName();
-      
-   
+         
+         NetworkInterface nets1 = NetworkInterface.getByName("eth0");
+         List<InterfaceAddress> interfaceAddresses = nets1.getInterfaceAddresses();    
+         //System.out.printf("InterfaceAddress: %s%n", interfaceAddresses.get(2).getAddress().getCanonicalHostName());
+         String localnodeip = interfaceAddresses.get(2).getAddress().getCanonicalHostName();
          
          //RoutingTable rt = new RoutingTable();
          List<RoutingTable> rt = new ArrayList<>();
@@ -60,10 +64,15 @@ public class TpAER extends Settings {
          PDU pduhello = new PDU();
          pduhello.setType(HELLO);
          pduhello.setIdnode(localnode);
+         pduhello.setIpnode(localnodeip);
+         
          ArrayList<String> neighbors = new ArrayList<>(10);
+         ArrayList<String> neighborsip = new ArrayList<>(10);
          //neighbors.add("n2");
          //neighbors.add("n3");
          pduhello.setNeighbors(neighbors);
+         pduhello.setNeighborsip(neighborsip);
+        
          
         
         
@@ -71,7 +80,7 @@ public class TpAER extends Settings {
          //System.out.println(gson.toJson(pduhello));
          
          
-         PeerDetection detect   = new PeerDetection(ip, port,localnode, neighbors, rt);
+         PeerDetection detect   = new PeerDetection(ip, port,localnode, neighbors, neighborsip, rt);
          detect.start();
         
         //O hello tem de ser criado antes de ser enviado
@@ -89,6 +98,17 @@ public class TpAER extends Settings {
          
          ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
          executor.scheduleAtFixedRate(helloRunnable, 0, secSendmsg, TimeUnit.SECONDS);
+         
+                    Runnable emptyneighRunnable = new Runnable() {
+               public void run() {
+                   pduhello.removeNeighbors();
+                   
+               }
+           };
+
+           ScheduledExecutorService executorneigh = Executors.newScheduledThreadPool(1);
+           executorneigh.scheduleAtFixedRate(emptyneighRunnable, 0, 15, TimeUnit.SECONDS);
+         
 
 
           
@@ -100,8 +120,11 @@ public class TpAER extends Settings {
 
         while( !stop )
         {
-          System.out.println( "2-SendFile 1-ReceiveFile");  
-          System.out.println( "enter \"0\" to exit");
+          System.out.println( "1-Show Table");    
+          System.out.println( "2-ReceiveFile");  
+          System.out.println( "3-SendFile");  
+        
+        //  System.out.println( "enter \"0\" to exit");
           String s = br.readLine();
 
           if( s.equals( "0" ) )
@@ -112,8 +135,17 @@ public class TpAER extends Settings {
             exit(0);
           }
           
+            if( s.equals( "1" ) )
+          {
+               System.out.println("----------" + localnode + "-----------");
+              for(RoutingTable rtr : rt) {
+                        System.out.println("Node:" + rtr.node.getDstid() +" Dist:" + rtr.dist + " TTL:" + (30 - (System.nanoTime()- rtr.node.getTTL()) / 1000000000));
+             }
+            
+            
+          }
           
-          if( s.equals( "1" ) )
+          if( s.equals( "2" ) )
           {
             System.out.print( "Receive File..." );
             
@@ -123,12 +155,35 @@ public class TpAER extends Settings {
             
           }
           
-          if( s.equals( "2" ) )
+          if( s.equals( "3" ) )
           {
             System.out.print( "Send File..." );
             
             Server serverFT = new Server();
             serverFT.sendfile();
+            
+          }
+          
+           if( s.equals( "4" ) )
+          {
+              /*
+              NetworkInterface nets1 = NetworkInterface.getByName("eth0");
+           
+             byte[] mac = nets1.getHardwareAddress(); 
+             
+             System.out.printf("Hardware name: %s%n", Arrays.toString(nets1.getHardwareAddress()));  
+             
+             List<InterfaceAddress> interfaceAddresses = nets1.getInterfaceAddresses();    
+             System.out.printf("InterfaceAddress: %s%n", interfaceAddresses.get(2).getAddress().getCanonicalHostName());
+             
+             System.out.print("Current MAC address : ");
+			
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < mac.length; i++) {
+			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
+		}
+	     System.out.println(sb.toString()); 
+              */
             
           }
           
@@ -157,22 +212,7 @@ public class TpAER extends Settings {
             //}
             
             
-             NetworkInterface nets1 = NetworkInterface.getByName("eth0");
            
-             byte[] mac = nets1.getHardwareAddress(); 
-             
-             System.out.printf("Hardware name: %s%n", Arrays.toString(nets1.getHardwareAddress()));  
-             
-             List<InterfaceAddress> interfaceAddresses = nets1.getInterfaceAddresses();    
-             System.out.printf("InterfaceAddress: %s%n", interfaceAddresses.get(2).getAddress().getCanonicalHostName());
-             
-             System.out.print("Current MAC address : ");
-			
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < mac.length; i++) {
-			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
-		}
-	     System.out.println(sb.toString()); 
          }
         
         

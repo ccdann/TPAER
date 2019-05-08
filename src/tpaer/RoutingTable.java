@@ -5,6 +5,8 @@
  */
 package tpaer;
 
+import java.util.List;
+
 /**
  *
  * @author ccdann
@@ -13,6 +15,7 @@ package tpaer;
     
     Node node;
     int dist;
+    
     
     public RoutingTable(){
     }
@@ -48,6 +51,19 @@ package tpaer;
     void addNeighbor(int dist){
     
     }
+    
+    public RoutingTable findUsingEnhancedForLoop(
+        String name, List<RoutingTable> routingt) {
+
+          for (RoutingTable rt : routingt) {
+              if (rt.getNode(node).getDstid().equals(name)) {
+                  return rt;
+              }
+          }
+          return null;
+      }
+    
+    
     
     //add neighbor
     //set netigh

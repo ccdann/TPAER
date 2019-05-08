@@ -22,17 +22,19 @@ import java.util.Set;
     private String ipNexthop;
     private int dist;
     private long cost;
+    private long ttl;
    
     public Node(){
     
     }
-    public Node(String dstid, String dstip, String idNexthop, String ipNexthop, int dist, long cost){
+    public Node(String dstid, String dstip, String idNexthop, String ipNexthop, int dist, long cost, long ttl){
                 this.dstid = dstid;
 		this.dstip = dstip;
                 this.idNexthop = idNexthop;
                 this.ipNexthop = ipNexthop;
 		this.dist = dist;
 		this.cost = cost;
+                this.ttl = ttl;
 	}
     
         public boolean isReachable() {
@@ -81,6 +83,14 @@ import java.util.Set;
         
         public int getCost(){
 		return (int) this.cost;
+	}
+        
+        public long getTTL(){
+		return this.ttl;
+	}
+        
+        public int setTTL(){
+		return (int) (long) this.ttl;
 	}
                        
  }
