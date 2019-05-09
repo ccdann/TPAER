@@ -37,12 +37,11 @@ import java.util.List;
         return this.node;
     }
     
-    void printTable(){
-        
+    void printTable(){ 
         System.out.println("Dest: " + node.getDstid() + " Dist: " + dist);
-       
-    
     }
+    
+    
     
     void setNeighbor(int dist){
     
@@ -51,6 +50,22 @@ import java.util.List;
     void addNeighbor(int dist){
     
     }
+    
+    
+     
+     /*
+        public RoutingTable getRoutingTable(Node node){   
+
+              if (rt.get(0).node.getDstid().equals(node.getDstid())) {
+                  return rt.get(0);
+              }
+          
+          return null;
+             }
+    
+    */
+    
+  
     
     public RoutingTable findUsingEnhancedForLoop(
         String name, List<RoutingTable> routingt) {
@@ -63,10 +78,8 @@ import java.util.List;
           return null;
       }
     
-    
-    
-    //add neighbor
-    //set netigh
+
+
     
 }
 

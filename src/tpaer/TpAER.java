@@ -72,7 +72,7 @@ public class TpAER extends Settings {
          //neighbors.add("n3");
          pduhello.setNeighbors(neighbors);
          pduhello.setNeighborsip(neighborsip);
-        
+         //pduhello.setRoutingTable((ArrayList<RoutingTable>) rt);
          
         
         
@@ -102,7 +102,6 @@ public class TpAER extends Settings {
                     Runnable emptyneighRunnable = new Runnable() {
                public void run() {
                    pduhello.removeNeighbors();
-                   
                }
            };
 

@@ -30,7 +30,12 @@ import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import static tpaer.Settings.HELLO;
+import static tpaer.Settings.ip;
+import static tpaer.Settings.port;
 import static tpaer.Settings.secSendmsg;
 
 /**
@@ -75,6 +80,10 @@ public class PeerDetection extends Thread{
         this.neighbors = neighbors;
         this.neighborsip = neighborsip;
         this.rt = rt;
+        
+        ScheduledExecutorService refreshcont = Executors.newScheduledThreadPool(1);
+        refreshcont.scheduleAtFixedRate(emptyCount, 0, 60, TimeUnit.SECONDS);
+        
        
     }
 
@@ -88,7 +97,7 @@ public class PeerDetection extends Thread{
         nodes.put(localnode, new Node(localnode, "", localnode, "",0,1,System.nanoTime()));
         while (true) {   
             try {
-
+                System.out.println(cont);
                 byte[] message = new byte[256];
                 DatagramPacket packet = new DatagramPacket(message, message.length);
                 // recieve the packet
@@ -111,7 +120,7 @@ public class PeerDetection extends Thread{
                 
             
                     
-                    
+                if(pdu.getType().equals(HELLO)){    
                 if (!localnode.contains(pdu.getIdnode())) {
 
                     //System.out.println("MSG " + msg);
@@ -165,9 +174,9 @@ public class PeerDetection extends Thread{
                          }        
                     }
                  
-                    cont ++;
                     
-                    if(cont >= 10){
+                    // 20 segundos percorrer dist = 1
+                    if(cont >= 4){
           
                     //DIST = 2
                      
@@ -184,22 +193,58 @@ public class PeerDetection extends Thread{
                              updateTableOptimized(neighbor.toString(),2,pdu);   
     
                         }
+
+                        }
+                    
+                       
+                    }
+                    //// 40 segundos percorrer dist = 2
+                    if(cont >= 8){
+                        
+                     PDU pduget = new PDU();
+                       pduget.setType("get");   
+                      if(verifyDist2()!= null){
+                       //System.out.println("HOP3" + verifyDist2().node.getDstid());
+                       pduget.setIdnode(verifyDist2().node.getDstid());
+                      
+                       //pduget.setRoutingTable((List<RoutingTable>) rt.iterator());
+                       
+                       //Volta a enviar com o hop2 para na tabela adicionar o hop 3
+                       Hello sendGet = new Hello(ip, port); 
+                       try {
+                        sendGet.send(gson.toJson(pduget));
+                        } catch (IOException ex) {
+                            Logger.getLogger(TpAER.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                          
-                
-                    }
+                         //System.out.println("GET" +  pdu.getRoutingTable(nodes.get(neighbor.toString())));
+  
+                         
+                        }
                     }
                     
                     
-                    //DIST = 3
+                    
+                     
+
+                    
+                    
+                    //DIST = 3     
+              
                     //node contains hop =2 return rt;
                     
-                   
-                    
-                    
-                    
-                    
-                    
-                }          
+                 cont ++; 
+                }
+            }else if(pdu.getType().equals("get")){
+                    if(cont >= 8){
+                     //System.out.println("GET" +  msg);
+                     //System.out.println("GET pdu" +  pdu.getIdnode());
+                     if(pdu.getIdnode()!=null){
+                     nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), "", pdu.getIdnode(), pdu.getIpnode(), 3, 1,System.nanoTime()));
+                     updateTableOptimized(pdu.getIdnode(),3,pdu);
+                     }
+                    }      
+            }
                         // Verifica e remove da RT TTL
                          
                         for (int i = 1; i < rt.size(); i++) {
@@ -214,32 +259,39 @@ public class PeerDetection extends Thread{
                 System.out.println("Exception Thrown: " + e.getLocalizedMessage());
             }
             
-            //cuidado apagar
-            
-            /*new java.util.Timer().schedule( 
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            cont = 10;
-                        }
-                    }, 
-                    5000 
-            );
-            */
-            
-        } 
+        }
+        
+        
     }
+    
+    
+     Runnable emptyCount = new Runnable() {
+               public void run() {
+                   cont =0; 
+               }
+           };
+
+           
 
     public RoutingTable verifyTable(String id) {
-              RoutingTable existshop1 = rt.stream()
+              RoutingTable existshop2 = rt.stream()
                                                 .filter(node -> id.equals(node.node.getDstid()))
                                                 .findAny()
                                                 .orElse(null);
                                                  //System.out.println(existshop1);   
-        return existshop1;
+        return existshop2;
 
     }
     
+     public RoutingTable verifyDist2() {
+        for (int i=0; i<rt.size(); i++){
+            if(rt.get(i).node.getDist()== 2){
+            return rt.get(i);
+            }
+        
+        }
+        return null;
+    }
  
     
     public void updateTableOptimized(String name, int dist, PDU pdu){

@@ -18,7 +18,10 @@ import java.util.List;
     String idnode;
     String ipnode;
     ArrayList<String> neighbors;    
-    ArrayList<String> neighborsip;   
+    ArrayList<String> neighborsip;  
+    //List<RoutingTable> rt = new ArrayList<>();
+   
+    
     
     public PDU(){
     
@@ -29,6 +32,7 @@ import java.util.List;
         this.idnode = idnode;    
         this.neighbors = neighbors;
         this.neighborsip = neighborsip;
+
     }
     
     public void setType(String type) {
@@ -76,22 +80,5 @@ import java.util.List;
         neighborsip.clear();
      }
      
-     
-      public void setRoutingTable(RoutingTable node){ 
-             
-             }
-     
-     public void getRoutingTable(Node node){ 
-             
-             }
 
-    public void setTTL(){
-    
-    
-    }
-    
-
-
-    
-    
 }

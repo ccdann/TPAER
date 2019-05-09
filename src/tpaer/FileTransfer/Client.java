@@ -49,7 +49,7 @@ public class Client {
                          DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
                          BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
 
-                         System.out.println("Write Get to start...");
+                         System.out.println("Write start to start...");
                          String str="",filename="",filename2="/home/core/Desktop/testeumdois.txt";  
                          
                          try{
