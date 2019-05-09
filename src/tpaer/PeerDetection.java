@@ -60,6 +60,8 @@ public class PeerDetection extends Thread{
             
     List<RoutingTable> rt =  new ArrayList<RoutingTable>();
 
+
+   
     /**
      *
      * @param ip
@@ -83,6 +85,9 @@ public class PeerDetection extends Thread{
         
         ScheduledExecutorService refreshcont = Executors.newScheduledThreadPool(1);
         refreshcont.scheduleAtFixedRate(emptyCount, 0, 60, TimeUnit.SECONDS);
+
+        
+        
         
        
     }
@@ -97,7 +102,7 @@ public class PeerDetection extends Thread{
         nodes.put(localnode, new Node(localnode, "", localnode, "",0,1,System.nanoTime()));
         while (true) {   
             try {
-                System.out.println(cont);
+                //System.out.println(cont);
                 byte[] message = new byte[256];
                 DatagramPacket packet = new DatagramPacket(message, message.length);
                 // recieve the packet
@@ -143,7 +148,7 @@ public class PeerDetection extends Thread{
                                 <!--- É preciso verificar primeiro se o nó está na RT! 
                     */
                     
-                   nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), "", pdu.getIdnode(), "", 1, 1,System.nanoTime()));                
+                   nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), pdu.getIpnode(), pdu.getIdnode(), pdu.getIpnode(), 1, 1,System.nanoTime()));                
                    
                    
                   
@@ -184,8 +189,16 @@ public class PeerDetection extends Thread{
                     //{"type":"Hello","idnode":"n2","neighbors":["n1","n4"]}
                     //Procura em todos os neighbors e adiciona em falta
                     for (Object neighbor : pdu.getNeighbors()) {
-                         if(!localnode.contains(neighbor.toString())){
-                             nodes.put(neighbor.toString(), new Node(neighbor.toString(), "", pdu.getIdnode(), pdu.getIpnode(), 2, 1,System.nanoTime()));
+                            
+                         if(!localnode.contains(neighbor.toString())){         
+                             //getneighborip
+                             int index = pdu.getNeighbors().indexOf(neighbor);
+                             //System.out.println(index);
+                             //System.out.println(pdu.getNeighborsip().get(index).toString());
+                             
+                             
+                             
+                             nodes.put(neighbor.toString(), new Node(neighbor.toString(), pdu.getNeighborsip().get(index).toString(), pdu.getIdnode(), pdu.getIpnode(), 2, 1,System.nanoTime()));
                              //updateTableOptimized(neighbor.toString(),2, pdu);  
                          }
                          
@@ -206,6 +219,7 @@ public class PeerDetection extends Thread{
                       if(verifyDist2()!= null){
                        //System.out.println("HOP3" + verifyDist2().node.getDstid());
                        pduget.setIdnode(verifyDist2().node.getDstid());
+                       pduget.setIpnode(verifyDist2().node.getDstip());
                       
                        //pduget.setRoutingTable((List<RoutingTable>) rt.iterator());
                        
@@ -240,7 +254,7 @@ public class PeerDetection extends Thread{
                      //System.out.println("GET" +  msg);
                      //System.out.println("GET pdu" +  pdu.getIdnode());
                      if(pdu.getIdnode()!=null){
-                     nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), "", pdu.getIdnode(), pdu.getIpnode(), 3, 1,System.nanoTime()));
+                     nodes.put(pdu.getIdnode(), new Node(pdu.getIdnode(), pdu.getIpnode(), pdu.getIdnode(), pdu.getIpnode(), 3, 1,System.nanoTime()));
                      updateTableOptimized(pdu.getIdnode(),3,pdu);
                      }
                     }      
@@ -270,6 +284,15 @@ public class PeerDetection extends Thread{
                    cont =0; 
                }
            };
+     
+     
+     public static int getIndexOf(ArrayList[] strings, String item) {
+            for (int i = 0; i < strings.length; i++) {
+                if (item.equals(strings[i])) return i;
+            }
+            return -1;
+        
+    }
 
            
 

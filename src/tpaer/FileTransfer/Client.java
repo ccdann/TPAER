@@ -47,17 +47,17 @@ public class Client {
                          Socket s=new Socket("10.0.0.2",5000);  
                          DataInputStream din=new DataInputStream(s.getInputStream());  
                          DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
-                         BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
 
-                         System.out.println("Write start to start...");
+
                          String str="",filename="",filename2="/home/core/Desktop/testeumdois.txt";  
                          
                          try{
-                         while(!str.equals("start"))
-                                 str=br.readLine(); 
+                        
+                      
+                             
+                                 //str=br.readLine(); 
 
-                                 dout.writeUTF(str); 
-                                 dout.flush();  
+                    
 
                                  filename=din.readUTF();
                                  

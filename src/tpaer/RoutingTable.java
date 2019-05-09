@@ -11,10 +11,10 @@ import java.util.List;
  *
  * @author ccdann
  */
- class RoutingTable {
+public class RoutingTable {
     
-    Node node;
-    int dist;
+    public Node node;
+    public int dist;
     
     
     public RoutingTable(){

@@ -5,6 +5,7 @@
  */
 package tpaer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
  *
  * @author ccdann
  */
- class Node {
+ public class Node {
     
   
     private String dstid;
@@ -88,7 +89,7 @@ import java.util.Set;
         public long getTTL(){
 		return this.ttl;
 	}
-        
+            
         public int setTTL(){
 		return (int) (long) this.ttl;
 	}

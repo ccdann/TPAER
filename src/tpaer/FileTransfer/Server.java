@@ -19,47 +19,55 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author ccdann
  */
-public class Server extends Thread {
+public class Server implements Runnable {
 
     public Server() throws SocketException, IOException{
 
     }
-    
-    
-    /*
-        String filename;
-        System.out.println("Enter File Name: ");
-        Scanner sc=new Scanner(System.in);
-        filename=sc.nextLine();
-        sc.close();
-    
-    
-    */
-
 
    // FileOutputStream f = new FileOutputStream("/home/core/Desktop/teste.txt");
     String filename = "/home/core/Desktop/teste.txt";
 
 
-
-    
-    public void sendfile() throws IOException {
-        
+    public void run() {
+      
         
             while(true)
             {
                     //create server socket on port 5000
-            ServerSocket ss=new ServerSocket(5000); 
+            ServerSocket ss = null; 
+                try {
+                    ss = new ServerSocket(5000);
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
             System.out.println ("Waiting for request");
-            Socket s=ss.accept();  
+            Socket s = null;  
+                try {
+                    s = ss.accept();
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
             System.out.println ("Connected With "+s.getInetAddress().toString());
-            DataInputStream din=new DataInputStream(s.getInputStream());  
-            DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
+            DataInputStream din = null;  
+                try {
+                    din = new DataInputStream(s.getInputStream());
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            DataOutputStream dout = null;  
+                try {
+                    dout = new DataOutputStream(s.getOutputStream());
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
             try{
             String str="";  
 
@@ -104,9 +112,21 @@ public class Server extends Thread {
                     e.printStackTrace();
                     System.out.println("An error occured");
             }
-            din.close();  
-            s.close();  
-            ss.close();  
+                try {  
+                    din.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {  
+                    s.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {  
+                    ss.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
     }

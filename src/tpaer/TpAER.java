@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +61,9 @@ public class TpAER extends Settings {
          
          //RoutingTable rt = new RoutingTable();
          List<RoutingTable> rt = new ArrayList<>();
+         List<RoutingTableFiles> rtf = new ArrayList<>();
+         HashMap<String, String> files = new HashMap<>();
+        
         
          
          PDU pduhello = new PDU();
@@ -82,6 +87,8 @@ public class TpAER extends Settings {
          
          PeerDetection detect   = new PeerDetection(ip, port,localnode, neighbors, neighborsip, rt);
          detect.start();
+         ServerQueryFiles serverFT = new ServerQueryFiles(rt, files);
+         serverFT.start();
         
         //O hello tem de ser criado antes de ser enviado
         
@@ -109,19 +116,19 @@ public class TpAER extends Settings {
            executorneigh.scheduleAtFixedRate(emptyneighRunnable, 0, 15, TimeUnit.SECONDS);
          
 
-
-          
-        System.out.println("Press to show table");
-
         
         boolean stop = false;
-        BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) );
+        BufferedReader br = new BufferedReader( new InputStreamReader( System.in ));
 
         while( !stop )
         {
+          System.out.println("----------" + "MENU" + "-----------");
           System.out.println( "1-Show Table");    
-          System.out.println( "2-ReceiveFile");  
-          System.out.println( "3-SendFile");  
+          System.out.println( "2-Query File");
+          System.out.println( "3-Show files on Server"); 
+          System.out.println("----------" + "----" + "-----------");
+ 
+          //System.out.println( "3-SendFile");  
         
         //  System.out.println( "enter \"0\" to exit");
           String s = br.readLine();
@@ -146,21 +153,32 @@ public class TpAER extends Settings {
           
           if( s.equals( "2" ) )
           {
-            System.out.print( "Receive File..." );
-            
-            Client clientFT = new Client("127.0.0.1");
-            clientFT.receivefile();
-            
-            
-          }
-          
+              ClientTest2 ct = new ClientTest2();
+              
+              
+              BufferedReader br2 = new BufferedReader(new InputStreamReader(System.in)); 
+              System.out.println("Type query");  
+              String str="";           
+              str=br2.readLine(); 
+               
+               
+               for(int i=1; i<rt.size(); i++){
+                   ct.receivefile(rt.get(i).node.getDstip(), str);
+               // System.out.println("IP " + rt.get(i).node.getDstip());
+               }
+           
+                 //Client clientFT = new Client("127.0.0.1");
+            //clientFT.receivefile();
+
+                
+           }
+           
+
           if( s.equals( "3" ) )
-          {
-            System.out.print( "Send File..." );
-            
-            Server serverFT = new Server();
-            serverFT.sendfile();
-            
+          {    
+           for (Map.Entry<String, String> entry : files.entrySet()) {
+                 System.out.println(entry.getKey()+" : "+entry.getValue());
+            } 
           }
           
            if( s.equals( "4" ) )
@@ -186,38 +204,9 @@ public class TpAER extends Settings {
             
           }
           
-          
-         /*
-          
-          else{
-              System.out.println("----------" + localnode + "-----------");
-              for(RoutingTable rtr : rt) {
-                        System.out.println("Node:" + rtr.node.getDstid() +" Dist:" + rtr.dist);
-             }
-           
-            }
-          
-          */
- 
+        
           }
-        
-        
-       
-        
-         if (num==3){   
-         //   Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-          //  for (NetworkInterface netint : Collections.list(nets)) {
-            //  displayInterfaceInformation(netint);
-            //}
-            
-            
-           
-         }
-        
-        
-        
-        
-    
+
     }  
         
         private static void displayInterfaceInformation(NetworkInterface netint) throws SocketException {
