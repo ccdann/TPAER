@@ -58,7 +58,9 @@ public class ServerQueryFiles extends Thread{
     ArrayList<String> address = new ArrayList<String>();
     int numfilesrandom = (int)(Math.random()*7);
     //int numfilesrandom = 5;
-    
+    private static ServerSocket serverSocket;
+    private static Socket clientSocket = null;
+    String file = null;
     
     
     
@@ -73,8 +75,7 @@ public class ServerQueryFiles extends Thread{
         }
  
 
-    private static ServerSocket serverSocket;
-    private static Socket clientSocket = null;
+
 
     @Override
       public void run() {
@@ -123,28 +124,23 @@ public class ServerQueryFiles extends Thread{
                 Logger.getLogger(ServerQueryFiles.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                ServerSendTCP s = new ServerSendTCP();
-          
-                System.out.println("STATES " + s.isAlive());
                
+               
+             //   System.out.println("STATES " + s.isAlive());
+              
                 
                 if(files.get(message)!=null){
-                 oos.writeObject("302 Found file");  
+                 oos.writeObject("302 Found file"); 
+                 file = files.get(message);
+                 //System.out.println("FILE!!"+  files.get(message));        
                 }else{
                  oos.writeObject("Not found file");
                 }
                 
                 if(message.equals("200")){
-                    s.start();
-                   
-                }else{
-                    if (s.isAlive()) s.interrupt();
-                  
-                   
-                }  
-                if(message.equals("500")){
-                s.interrupt();
-                }  
+                    ServerSendTCP s = new ServerSendTCP(file);
+                    s.start(); 
+                }
                 
                 //if(message.equals("musica")){
                 //oos.writeObject("302 Found file");
@@ -188,13 +184,13 @@ public class ServerQueryFiles extends Thread{
             name.add("bye");
             name.add("get");
             name.add("x");
-            address.add("home/core/Desktop/teste");
-            address.add("home/core/Desktop/need");
-            address.add("home/core/Desktop/hello");
-            address.add("home/core/Desktop/you");
-            address.add("home/core/Desktop/bye");
-            address.add("home/core/Desktop/get");
-            address.add("home/core/Desktop/x");
+            address.add("/home/core/Desktop/files/teste.txt");
+            address.add("/home/core/Desktop/files/need.txt");
+            address.add("/home/core/Desktop/files/hello.txt");
+            address.add("/home/core/Desktop/files/you.txt");
+            address.add("/home/core/Desktop/files/bye.txt");
+            address.add("/home/core/Desktop/files/get.txt");
+            address.add("/home/core/Desktop/files/x.txt");
             
                 for(int i=0;i<numfilesrandom;i++){
                     int random = rand.nextInt(name.size());

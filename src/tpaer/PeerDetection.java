@@ -327,7 +327,7 @@ public class PeerDetection extends Thread{
                 .orElse(null);
 
                  if(exists == null){
-                     System.out.println("ADD 1 " + nodes.get(name).getDstid() +" D " + nodes.get(name).getDist());    
+                     //System.out.println("ADD 1 " + nodes.get(name).getDstid() +" D " + nodes.get(name).getDist());    
                      rt.add(new RoutingTable(nodes.get(name), dist)); 
                  }else{
                     if(exists.node.getDist() == dist){  

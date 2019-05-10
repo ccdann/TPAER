@@ -121,7 +121,7 @@ public class TpAER extends Settings {
 
         while( !stop )
         {
-          System.out.println("----------" + "MENU" + "-----------");
+          System.out.println("---" +"MENU "+"Node:"+localnode+"----");
           System.out.println( "1-Show Table");    
           System.out.println( "2-Query File");
           System.out.println( "3-Show files on Server"); 

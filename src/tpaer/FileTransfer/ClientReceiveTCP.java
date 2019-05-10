@@ -19,8 +19,11 @@ import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 
 /**
  *
@@ -28,7 +31,10 @@ import java.net.SocketException;
  */
 public class ClientReceiveTCP {
     
-         
+         NetworkInterface nets1 = NetworkInterface.getByName("eth0");
+         List<InterfaceAddress> interfaceAddresses = nets1.getInterfaceAddresses();    
+         //System.out.printf("InterfaceAddress: %s%n", interfaceAddresses.get(2).getAddress().getCanonicalHostName());
+         String localnodeip = interfaceAddresses.get(2).getAddress().getCanonicalHostName();
 
 
     public ClientReceiveTCP() throws SocketException, IOException {
@@ -48,9 +54,9 @@ public class ClientReceiveTCP {
                          DataInputStream din=new DataInputStream(s.getInputStream());  
                          DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
                          BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
-
+                         //System.out.println("HOSTNAME "+ s.getInetAddress().getCanonicalHostName());
                          System.out.println("Press enter to proceed");
-                         String str="",filename="",filename2="/home/core/Desktop/testeumdois.txt";  
+                         String str="",filename="",filename2="/home/core/Desktop/"+localnodeip+"/";  
                          
                          try{
                                      str=br.readLine(); 
@@ -64,15 +70,16 @@ public class ClientReceiveTCP {
                                  filename=din.readUTF();
                                  
                                  System.out.println("Receving file: "+filename);
+                                 //System.out.println("Filename: "+ filename.substring(24));
                                 // filename="client"+filename;
-                                 System.out.println("Saving as file: "+filename);
+                                 System.out.println("Saving as file: "+filename2+filename.substring(25));
                          //
                          long sz=Long.parseLong(din.readUTF());
                          System.out.println ("File Size: "+(sz/(1024*1024))+" MB");
 
                          byte b[]=new byte [1024];
                          System.out.println("Receving file..");
-                         FileOutputStream fos=new FileOutputStream(new File(filename2),true);
+                         FileOutputStream fos=new FileOutputStream(new File(filename2+filename.substring(25)),true);
                          long bytesRead;
                          do
                          {

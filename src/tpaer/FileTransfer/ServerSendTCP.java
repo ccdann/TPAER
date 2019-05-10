@@ -28,12 +28,17 @@ import java.util.logging.Logger;
  */
 public class ServerSendTCP extends Thread {
 
-    public ServerSendTCP() throws SocketException, IOException{
-
+    
+    
+    //String filename = "/home/core/Desktop/teste.txt";
+    String filename;
+    
+    public ServerSendTCP(String filename) throws SocketException, IOException{
+     this.filename = filename;   
     }
 
    // FileOutputStream f = new FileOutputStream("/home/core/Desktop/teste.txt");
-    String filename = "/home/core/Desktop/teste.txt";
+    
 
 @Override
     public void run() {
