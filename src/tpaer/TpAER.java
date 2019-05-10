@@ -61,7 +61,6 @@ public class TpAER extends Settings {
          
          //RoutingTable rt = new RoutingTable();
          List<RoutingTable> rt = new ArrayList<>();
-         List<RoutingTableFiles> rtf = new ArrayList<>();
          HashMap<String, String> files = new HashMap<>();
         
         
@@ -153,7 +152,7 @@ public class TpAER extends Settings {
           
           if( s.equals( "2" ) )
           {
-              ClientTest2 ct = new ClientTest2();
+              ClientQueryFiles ct = new ClientQueryFiles();
               
               
               BufferedReader br2 = new BufferedReader(new InputStreamReader(System.in)); 

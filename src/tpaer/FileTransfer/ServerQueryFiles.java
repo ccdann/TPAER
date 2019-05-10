@@ -22,14 +22,20 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tpaer.Node;
 import tpaer.RoutingTable;
+import static tpaer.Settings.secSendmsg;
 
  
 public class ServerQueryFiles extends Thread{
@@ -59,8 +65,9 @@ public class ServerQueryFiles extends Thread{
     
     
   
-        public ServerQueryFiles(List<RoutingTable> rt,  HashMap<String, String> files){
-          
+        public ServerQueryFiles(List<RoutingTable> rt,  HashMap<String, String> files) throws IOException{
+           
+            
             this.rt = rt;
             this.files = files;
         }
@@ -71,6 +78,7 @@ public class ServerQueryFiles extends Thread{
 
     @Override
       public void run() {
+      
           addfiles(numfilesrandom);
 
          try {
@@ -115,15 +123,28 @@ public class ServerQueryFiles extends Thread{
                 Logger.getLogger(ServerQueryFiles.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                
+                ServerSendTCP s = new ServerSendTCP();
           
+                System.out.println("STATES " + s.isAlive());
+               
+                
                 if(files.get(message)!=null){
-                 oos.writeObject("302 Found file");
-                 Server s = new Server();
-                 s.run();
+                 oos.writeObject("302 Found file");  
                 }else{
                  oos.writeObject("Not found file");
                 }
+                
+                if(message.equals("200")){
+                    s.start();
+                   
+                }else{
+                    if (s.isAlive()) s.interrupt();
+                  
+                   
+                }  
+                if(message.equals("500")){
+                s.interrupt();
+                }  
                 
                 //if(message.equals("musica")){
                 //oos.writeObject("302 Found file");
